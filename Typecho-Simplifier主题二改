@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="<?php $this->options->charset(); ?>"> <!-- 设置字符编码为网站设置的编码 -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"> <!-- 兼容 IE 浏览器的最新渲染模式 -->
+    <meta name="renderer" content="webkit"> <!-- 强制使用 WebKit 渲染引擎 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"> <!-- 设置视口宽度为设备宽度，并禁用缩放 -->
+    <title><?php $this->archiveTitle(array(
+            'category'  =>  _t('分类 %s 下的文章'),
+            'search'    =>  _t('包含关键字 %s 的文章'),
+            'tag'       =>  _t('标签 %s 下的文章'),
+            'author'    =>  _t('%s 发布的文章')
+        ), '', ' - '); ?><?php $this->options->title(); ?></title> <!-- 设置网页标题，包含分类、搜索、标签、作者信息 -->
+    <link rel="icon" type="image/svg+xml" href="https://wowood.cn/good1.svg"> <!-- 设置网页图标 -->
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('prism.css'); ?>"> <!-- 引入 Prism.js 代码高亮样式 -->
+    <link rel="stylesheet" href="<?php $this->options->themeUrl('prism-line-numbers.css'); ?>"> <!-- 引入 Prism.js 行号样式 -->
+    <script defer src="<?php $this->options->themeUrl('prism.js'); ?>"></script> <!-- 引入 Prism.js 代码高亮脚本 -->
+    <script defer src="<?php $this->options->themeUrl('prism-line-numbers.js'); ?>"></script> <!-- 引入 Prism.js 行号脚本 -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script> <!-- 引入 jQuery 库 -->
+    <script src="https://cdn.jsdelivr.net/gh/xiaoyanu/file-test@2021.11.23/more/dengxiang.js"></script> <!-- 引入自定义 JavaScript 文件 -->
+    <style>
+        /* 全局设置字体 */
+        * {
+            font-family: "微软雅黑", Arial, sans-serif; /* 设置所有元素的字体 */
+        }
+
+        body {
+            word-break: break-all; /* 允许单词断行 */
+            word-wrap: break-word; /* 允许单词换行 */
+            text-align: justify; /* 文本对齐方式为两端对齐 */
+            font-size: 16px; /* 设置默认字体大小 */
+            margin: 0; /* 去掉外边距 */
+            padding: 0; /* 去掉内边距 */
+            background-color: #FBFCFF; /* 设置背景色 */
+            color: #000; /* 设置字体颜色 */
+            padding-bottom: 40px; /* 为底部留出空间以避免被固定元素遮挡 */
+            box-sizing: border-box; /* 计算元素的宽度和高度时包括边框和内边距 */
+            overflow-y: scroll; /* 始终显示纵向滚动条 */
+        }
+
+        h1 {
+            font-size: 22px !important; /* 设置 h1 的字体大小 */
+            line-height: 1.5; /* 设置行高 */
+            margin: 5px 0; /* 设置上下外边距 */
+        }
+        h2 {
+            font-size: 20px !important; /* 设置 h2 的字体大小 */
+            line-height: 1.5; /* 设置行高 */
+            margin: 5px 0; /* 设置上下外边距 */
+        }
+        h3 {
+            font-size: 18px !important; /* 设置 h3 的字体大小 */
+            line-height: 1.5; /* 设置行高 */
+            margin: 5px 0; /* 设置上下外边距 */
+        }
+        h4 {
+            font-size: 16px !important; /* 设置 h4 的字体大小 */
+            line-height: 1.5; /* 设置行高 */
+            margin: 5px 0; /* 设置上下外边距 */
+        }
+        h5 {
+            font-size: 14px !important; /* 设置 h5 的字体大小 */
+            line-height: 1.5; /* 设置行高 */
+            margin: 5px 0; /* 设置上下外边距 */
+        }
+        h6 {
+            font-size: 12px !important; /* 设置 h6 的字体大小 */
+            line-height: 1.5; /* 设置行高 */
+            margin: 5px 0; /* 设置上下外边距 */
+        }
+
+        img {
+            max-width: 100%; /* 图片最大宽度为容器宽度 */
+        }
+
+        pre {
+            background: #f7f7f7; /* 代码块背景色 */
+            margin: 1.25rem 0; /* 代码块的上下外边距 */
+            padding: .9375rem; /* 代码块的内边距 */
+            overflow: auto; /* 超出部分显示滚动条 */
+            color: #000; /* 代码文字颜色 */
+            line-height: 1.5; /* 行高 */
+        }
+
+        blockquote {
+            padding: 0 15px; /* 引用块的左右内边距 */
+            color: #000; /* 引用块文字颜色 */
+            border-left: 4px solid #bbd; /* 引用块左边边框 */
+        }
+
+        table {
+            width: 100%; /* 表格宽度为容器宽度 */
+            border-spacing: 2px; /* 表格单元格间距 */
+            margin: 20px 0; /* 表格的上下外边距 */
+        }
+
+        td, th {
+            padding: 5px; /* 单元格内边距 */
+            text-align: center; /* 单元格文字水平居中 */
+        }
+
+        th {
+            background: #DDD; /* 表头背景色 */
+        }
+
+        td {
+            background: #Fbfcff; /* 单元格背景色 */
+            text-align: left; /* 单元格文字左对齐 */
+            font-size: 14px; /* 单元格字体大小 */
+        }
+
+        tr:hover td {
+            background: #ffffcc; /* 鼠标悬停时单元格背景色 */
+        }
+
+        #top {
+            position: fixed; /* 固定位置 */
+            bottom: 80px; /* 距离底部 80px */
+            right: 30px; /* 距离右侧 30px */
+            opacity: 1; /* 不透明度 */
+            cursor: pointer; /* 鼠标样式为手型 */
+        }
+
+        .container {
+            max-width: 800px; /* 最大宽度 800px */
+            margin: 0 auto; /* 水平居中 */
+            padding: 50px 20px 20px; /* 上、右、下内边距 */
+            box-sizing: border-box; /* 计算宽度和高度时包括内边距和边框 */
+        }
+
+        .container p {
+            margin: 0; /* 去掉段落外边距 */
+            padding: 0; /* 去掉段落内边距 */
+            line-height: 1.5; /* 行高 */
+            color: #000; /* 段落文字颜色 */
+            font-size: 16px; /* 段落字体大小 */
+        }
+
+        .postBody {
+            display: none; /* 隐藏 postBody 元素 */
+        }
+
+        .post-date {
+            color: #4d4d4d; /* 段落文字颜色 */
+            font-size: 16px; /* 段落字体大小 */
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%; /* 容器最大宽度为 100% */
+                padding: 40px 20px 20px; /* 小屏幕下的内边距 */
+            }
+            body {
+                font-size: 16px; /* 设置字体大小 */
+            }
+            table {
+                font-size: 14px; /* 表格字体大小 */
+            }
+            .search-container {
+                display: none; /* 隐藏搜索框 */
+            }
+            .post-date {
+                display: none; /* 隐藏日期 */
+            }
+        }
+
+        /* 滚动条样式 */
+        body::-webkit-scrollbar {
+            width: 0px; /* 隐藏滚动条 */
+        }
+
+        body::-webkit-scrollbar-thumb {
+            background-color: rgba(136, 136, 136, 0.3); /* 滚动条滑块颜色 */
+        }
+
+        body::-webkit-scrollbar-track {
+            background-color: rgba(246, 246, 243, 0.3); /* 滚动条轨道颜色 */
+        }
+
+        /* 固定在顶部的样式 */
+        .header-top {
+            position: fixed; /* 固定在顶部 */
+            top: 0; /* 距离顶部 0px */
+            width: 100%; /* 宽度为 100% */
+            background-color: #FBFCFF; /* 背景色 */
+            box-shadow: 0 2px 3px rgba(0,0,0,0.0); /* 添加阴影效果 */
+            z-index: 1000; /* 确保在其他内容之上 */
+            padding: 5px 10px; /* 内边距 */
+            box-sizing: border-box; /* 计算宽度和高度时包括内边距和边框 */
+        }
+
+        .header-links {
+            display: flex; /* 使用 flex 布局 */
+            align-items: center; /* 垂直居中对齐 */
+            justify-content: space-between; /* 水平分布 */
+        }
+
+        .header-links a {
+            color: #000; /* 链接颜色 */
+            text-decoration: none; /* 链接下划线 */
+            margin: 0 10px; /* 链接左右外边距 */
+        }
+
+        .header-links a:hover {
+            color: #000; /* 链接悬停时颜色 */
+        }
+
+        .search-container {
+            flex: 1; /* 使搜索容器填满剩余空间 */
+            text-align: center; /* 搜索框居中对齐 */
+        }
+
+        #searchBox.search-form-input {
+            width: 752px; /* 搜索框宽度 */
+            padding: 4px; /* 搜索框内边距 */
+            border: 1px solid rgba(0, 0, 0, 0.15); /* 边框颜色 */
+            border-radius: 2px; /* 边框圆角 */
+            font-family: "微软雅黑", Arial, sans-serif; /* 字体 */
+            font-size: 16px; /* 字体大小 */
+        }
+
+        /* 底部备案号样式 */
+        .footer {
+            position: fixed; /* 固定在底部 */
+            bottom: 0; /* 距离底部 0px */
+            width: 100%; /* 宽度为 100% */
+            background-color: #FBFCFF; /* 背景色 */
+            text-align: center; /* 文本居中对齐 */
+            padding: 10px 0; /* 内边距 */
+            border-top: 1px solid #e7e7e7; /* 顶部边框 */
+        }
+
+        .footer a {
+            color: #000; /* 链接颜色 */
+            text-decoration: none; /* 去掉下划线 */
+        }
+
+        .footer a:hover {
+            text-decoration: none; /* 链接悬停时下划线 */
+        }
+
+        /* 为首页表格添加特定样式 */
+        .home-table {
+            width: 100%; /* 表格宽度为容器宽度 */
+            border-collapse: collapse; /* 合并边框 */
+            margin: 10px 0; /* 表格的上下外边距 */
+        }
+        .header-links a:hover {
+        text-decoration: underline; /* 链接悬停时下划线 */
+        }
+
+        .home-table a {
+        text-decoration: none; /* 去掉下划线 */
+        }
+
+        .home-table a:hover {
+        text-decoration: underline; /* 悬停时添加下划线 */
+        }
+
+        .post-content a,
+        .post-content table a {
+        text-decoration: none; /* 去掉下划线 */
+        }
+
+        .post-content a:hover,
+        .post-content table a:hover {
+        text-decoration: underline; /* 悬停时添加下划线 */
+        }
+
+        .home-table td, .home-table th {
+            padding: 4px; /* 单元格内边距 */
+            text-align: left; /* 单元格文字水平居中 */
+            border: 1px dashed #d9d9d9; /* 单元格边框 */
+        }
+
+        .home-table th {
+            background: #f0f0f0; /* 表头背景色 */
+            text-align: justify; /* 标题列文字两端对齐 */
+        }
+
+        .home-table td {
+            background: #fbfcff; /* 单元格背景色 */
+            font-size: 16px; /* 字体大小 */
+        }
+
+        /* 设置第一列和第二列的宽度 */
+        .home-table td:first-child, .home-table th:first-child {
+            width: 15%; /* 第一列宽度 */
+        }
+
+        .home-table td:nth-child(2), .home-table th:nth-child(2) {
+            width: 70%; /* 第二列宽度 */
+        }
+
+        .home-table tr:hover td {
+            background: #ffffcc; /* 鼠标悬停时单元格背景色 */
+        }
+
+        @media print {
+           .footer {
+               display: none; /* 隐藏底部备案号 */
+           }
+           .header-top {
+               display: none; /* 隐藏顶部导航 */
+           }
+           #searchBox.search-form-input {
+               display: none; /* 隐藏搜索框 */
+           }
+        }
+    </style>
+    <?php $this->header(); ?> <!-- 插入网站头部内容 -->
+</head>
+
+<body>
+    <!-- 固定在页面顶部的部分 -->
+    <div class="header-top">
+        <div class="header-links">
+            <a href="<?php $this->options->siteUrl(); ?>"><?php $this->options->title() ?></a> <!-- 网站标题链接 -->
+            <div class="search-container">
+                <input type="text" id="searchBox" class="search-form-input" placeholder=""><!-- 搜索框 -->
+            </div>
+            <a href="https://wowood.cn/index.php/254.html" id="aboutMeLink" class="about-me-link">关于</a> <!-- 关于我链接 -->
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 内容部分 -->
+        <?php
+        if ($this->is('index')) { /* 如果是首页 */
+            echo '<table class="home-table">'; // 使用特定类名
+            echo '<tbody>'; // 表格主体
+            $this->widget('Widget_Contents_Post_Recent', 'pageSize=10000')->parse('<tr class="post-row"><td class="post-date">{year}/{month}/{day}</td><td><a href="{permalink}" class="post-link">{title}</a></td></tr>'); /* 显示最新文章列表 */
+            echo '</tbody></table>'; // 结束表格
+        } else {
+            if ($this->is('category')) { /* 如果是分类页面 */
+                $this->widget('Widget_Archive@index', 'pageSize=10000&type=category', 'mid='.getCategeId($this->getArchiveSlug()))->parse('{year}/{month}/{day} <a href="{permalink}" class="post-link">{title}</a><br>'); /* 显示分类下的文章列表 */
+            } elseif ($this->is('post') || $this->is('page')) { /* 如果是文章或页面 */
+                ?>
+                <article>
+                    <h3><?php $this->title() ?></h3> <!-- 文章标题 -->
+                    <hr> <!-- 分隔线 -->
+                    <div class="post-content">
+                        <?php $this->content(); ?> <!-- 文章内容 -->
+                    </div>
+                </article>
+                <hr/>
+                <script src="https://giscus.app/client.js"
+                        data-repo="baicai12138/wowood"
+                        data-repo-id="R_kgDOMjReLQ"
+                        data-category="Announcements"
+                        data-category-id="DIC_kwDOMjReLc4ChnRm"
+                        data-mapping="title"
+                        data-strict="0"
+                        data-reactions-enabled="1"
+                        data-emit-metadata="0"
+                        data-input-position="top"
+                        data-theme="preferred_color_scheme"
+                        data-lang="zh-CN"
+                        data-loading="lazy"
+                        crossorigin="anonymous"
+                        async>
+                </script>
+
+                <?php
+            } 
+        }
+        ?>
+        <a href="javascript:window.scrollTo(0, 0);" target="_self" id="top"></a> <!-- 回到顶部链接 -->
+    </div>
+    <div class="footer">
+        <a href="https://beian.miit.gov.cn" target="_blank">豫ICP备2023024837号-2</a> <!-- 网站备案号 -->
+    </div>
+    <script>
+        // 使正文文章中的链接在新窗口中打开
+        document.querySelectorAll('.post-content a').forEach(function(link) {
+            link.setAttribute('target', '_blank'); /* 设置所有文章内容中的链接在新窗口中打开 */
+        });
+
+        // 初始化灯箱效果
+        jQuery(function($){
+            $("img[src$=jpg],img[src$=gif],img[src$=png],img[src$=jpeg],img[src$=bmp]").addClass("spotlight").each(function(){
+                this.onclick=function(){
+                    return hs.expand(this); /* 设置图片点击后展开效果 */
+                }
+            });
+        });
+    </script>
+
+    <?php $this->footer(); ?> <!-- 插入网站底部内容 -->
+</body>
+</html>
